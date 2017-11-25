@@ -19,6 +19,8 @@
 *.dylib
 # [Mario] Dll should be uploaded for designers/artists to be able to open the project without VS
 # *.dll
+*.pdb
+
 
 # Fortran module files
 *.mod
@@ -30,7 +32,8 @@
 *.lib
 
 # Executables
-*.exe
+# [Mario] Exe should be uploaded for being able to upload builds
+# *.exe
 *.out
 *.app
 *.ipa
