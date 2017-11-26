@@ -3,9 +3,8 @@
 #include "GameFlow/Public/GameModeFSM.h"
 
 
-GameModeFSM::GameModeFSM() : FSM()
+GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash)
 {
-	SetState(EGameModeStates::Splash);
 	InitializeFunctions();
 }
 
