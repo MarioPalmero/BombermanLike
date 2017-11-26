@@ -26,15 +26,15 @@ void GameModeFSM::InitializeFunctions()
 	SetEndStateFunction(EGameModeStates::CharacterSelection, [&](EGameModeStates e) {EndCharacterSelection(e);});
 	SetUpdateFunction(EGameModeStates::CharacterSelection, [&](float t) {UpdateCharacterSelection(t);});
 
-	// Game functions
-	SetBeginStateFunction(EGameModeStates::Game, [&](EGameModeStates e) {BeginGame(e);});
-	SetEndStateFunction(EGameModeStates::Game, [&](EGameModeStates e) {EndGame(e);});
-	SetUpdateFunction(EGameModeStates::Game, [&](float t) {UpdateGame(t);});
+	// Match functions
+	SetBeginStateFunction(EGameModeStates::Match, [&](EGameModeStates e) {BeginMatch(e);});
+	SetEndStateFunction(EGameModeStates::Match, [&](EGameModeStates e) {EndMatch(e);});
+	SetUpdateFunction(EGameModeStates::Match, [&](float t) {UpdateMatch(t);});
 
 	// End Game functions
-	SetBeginStateFunction(EGameModeStates::EndGame, [&](EGameModeStates e) {BeginEndGame(e);});
-	SetEndStateFunction(EGameModeStates::EndGame, [&](EGameModeStates e) {EndEndGame(e);});
-	SetUpdateFunction(EGameModeStates::EndGame, [&](float t) {UpdateEndGame(t);});
+	SetBeginStateFunction(EGameModeStates::EndMatch, [&](EGameModeStates e) {BeginEndMatch(e);});
+	SetEndStateFunction(EGameModeStates::EndMatch, [&](EGameModeStates e) {EndEndMatch(e);});
+	SetUpdateFunction(EGameModeStates::EndMatch, [&](float t) {UpdateEndMatch(t);});
 }
 
 void GameModeFSM::BeginSplash(EGameModeStates previousState)
@@ -67,32 +67,32 @@ void GameModeFSM::EndCharacterSelection(EGameModeStates nextState)
 
 }
 
-void GameModeFSM::BeginGame(EGameModeStates previousState)
+void GameModeFSM::BeginMatch(EGameModeStates previousState)
 {
 
 }
 
-void GameModeFSM::UpdateGame(float DeltaTime)
+void GameModeFSM::UpdateMatch(float DeltaTime)
 {
 
 }
 
-void GameModeFSM::EndGame(EGameModeStates nextState)
+void GameModeFSM::EndMatch(EGameModeStates nextState)
 {
 
 }
 
-void GameModeFSM::BeginEndGame(EGameModeStates previousState)
+void GameModeFSM::BeginEndMatch(EGameModeStates previousState)
 {
 
 }
 
-void GameModeFSM::UpdateEndGame(float DeltaTime)
+void GameModeFSM::UpdateEndMatch(float DeltaTime)
 {
 
 }
 
-void GameModeFSM::EndEndGame(EGameModeStates nextState)
+void GameModeFSM::EndEndMatch(EGameModeStates nextState)
 {
 
 }

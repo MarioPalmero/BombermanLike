@@ -9,16 +9,16 @@
  * Enum representing the different states of the game, being these:
  * - Splash, a splash screen with the main title.
  * - CharacterSelection, a screen where we can select a character and select the number of players.
- * - Game, the main playable part where the players try to kill each other using bombs.
- * - EndGame, where the winner of the match is presented.
+ * - Match, the main playable part where the players try to kill each other using bombs.
+ * - EndMatch, where the winner of the match is presented.
  */
 UENUM(BlueprintType)
 enum EGameModeStates
 {
 	Splash,
 	CharacterSelection,
-	Game,
-	EndGame,
+	Match,
+	EndMatch,
 
 	GameModeStates_MAX
 };
@@ -44,11 +44,11 @@ private:
 	void UpdateCharacterSelection(float DeltaTime);					//!< Method called each frame while in the state
 	void EndCharacterSelection(EGameModeStates nextState);			//!< Method called at the end of the state
 
-	void BeginGame(EGameModeStates previousState);		//!< Method called at the begining of the state
-	void UpdateGame(float DeltaTime);					//!< Method called each frame while in the state
-	void EndGame(EGameModeStates nextState);				//!< Method called at the end of the state
+	void BeginMatch(EGameModeStates previousState);		//!< Method called at the begining of the state
+	void UpdateMatch(float DeltaTime);					//!< Method called each frame while in the state
+	void EndMatch(EGameModeStates nextState);				//!< Method called at the end of the state
 
-	void BeginEndGame(EGameModeStates previousState);		//!< Method called at the begining of the state
-	void UpdateEndGame(float DeltaTime);					//!< Method called each frame while in the state
-	void EndEndGame(EGameModeStates nextState);				//!< Method called at the end of the state
+	void BeginEndMatch(EGameModeStates previousState);		//!< Method called at the begining of the state
+	void UpdateEndMatch(float DeltaTime);					//!< Method called each frame while in the state
+	void EndEndMatch(EGameModeStates nextState);				//!< Method called at the end of the state
 };
