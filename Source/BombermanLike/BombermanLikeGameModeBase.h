@@ -21,11 +21,18 @@ class BOMBERMANLIKE_API ABombermanLikeGameModeBase : public AGameModeBase
 	
 public:
 	/*! \brief Returns current state
-	*
-	* Returns current state of the game
-	*/
+	 *
+	 * Returns current state of the game
+	 */
 	UFUNCTION(BlueprintCallable, Category = GameState)
 	EGameModeStates GetCurrentState() const;
+
+	/*! \brief Swaps between player controllers
+	 *
+	 * Swap the player controller of a pawn
+	 */
+	UFUNCTION(BlueprintCallable, Category = PlayerController)
+	static void SwapPlayerController(APawn* pawn, APlayerController* newPlayerController);
 
 	ABombermanLikeGameModeBase();
 	~ABombermanLikeGameModeBase();
