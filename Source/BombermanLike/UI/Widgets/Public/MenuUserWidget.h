@@ -12,7 +12,7 @@
 /////////////////////////////////////////////////
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndSplashScreenFinished);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndCharacterCreationFinished);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndCharacterSelectionFinished);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndEndMatchFinished);
 
 /*! \brief Widget of the menu interface
@@ -88,7 +88,7 @@ public:
 	FOnEndSplashScreenFinished	OnEndSplashScreenFinished;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = MenuState)
-	FOnEndCharacterCreationFinished OnEndCharacterCreationFinished;
+	FOnEndCharacterSelectionFinished OnEndCharacterSelectionFinished;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = MenuState)
 	FOnEndEndMatchFinished OnEndEndMatchFinished;

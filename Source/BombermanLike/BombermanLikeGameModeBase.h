@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFlow/Public/GameModeFSM.h"
 #include "Controllers/Public/UIPlayerController.h"
+#include "Controllers/Public/MatchPlayerController.h"
 #include "BombermanLikeGameModeBase.generated.h"
 
 /*! \brief Main Game Mode for the Bomberman-Like game
@@ -27,6 +28,20 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = GameState)
 	EGameModeStates GetCurrentState() const;
+
+	/*! \brief Notifies the Game Mode that the Splash Screen has finished
+	 *
+	 * Notifies the Gam Mode that the Splash Screen has finished and that it should act accordingly
+	 */
+	UFUNCTION(BlueprintCallable, Category = GameState)
+	void NotifyEndSplash();
+
+	/*! \brief Notifies the Game Mode that the Character Selection has finished
+	*
+	* Notifies the Gam Mode that the Character Selection has finished and that it should act accordingly
+	*/
+	UFUNCTION(BlueprintCallable, Category = GameState)
+		void NotifyEndCharacterSelection();
 
 	/*! \brief Swaps between player controllers
 	 *

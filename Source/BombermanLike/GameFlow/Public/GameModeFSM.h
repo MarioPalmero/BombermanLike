@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 class ABombermanLikeGameModeBase;
 class AUIPlayerController;
+class AMatchPlayerController;
 
 /*! \brief Enum that represents the high level states of the game.
  *
@@ -60,6 +61,7 @@ private:
 	void UpdateEndMatch(float DeltaTime);						//!< Method called each frame while in the state
 	void EndEndMatch(EGameModeStates nextState);				//!< Method called at the end of the state
 
-	ABombermanLikeGameModeBase* m_gameMode;		//!< Holds a reference to the current game mode
-	AUIPlayerController* m_UIController;		//!< Holds a reference to the UI controller when this exists
+	ABombermanLikeGameModeBase* m_gameMode;					//!< Holds a reference to the current game mode
+	TArray<AUIPlayerController*> m_UIControllers;			//!< Holds a reference to UI controllers when these exist
+	TArray<AMatchPlayerController*> m_matchControllers;		//!< Holds a reference to the Match controllers when these exist
 };

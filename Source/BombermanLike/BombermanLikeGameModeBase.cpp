@@ -11,6 +11,8 @@ ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super()
 
 	// Following RAII we initialize and destroy resources properly
 	m_gameState = new GameModeFSM();
+
+	SetActorTickEnabled(true);
 }
 
 ABombermanLikeGameModeBase::~ABombermanLikeGameModeBase()
@@ -22,6 +24,16 @@ ABombermanLikeGameModeBase::~ABombermanLikeGameModeBase()
 EGameModeStates ABombermanLikeGameModeBase::GetCurrentState() const
 {
 	return m_gameState->GetCurrentState();
+}
+
+void ABombermanLikeGameModeBase::NotifyEndSplash()
+{
+	m_gameState->SetState(EGameModeStates::CharacterSelection);
+}
+
+void ABombermanLikeGameModeBase::NotifyEndCharacterSelection()
+{
+	m_gameState->SetState(EGameModeStates::Match);
 }
 
 void ABombermanLikeGameModeBase::SwapPlayerController(APawn * pawn, APlayerController * newPlayerController)

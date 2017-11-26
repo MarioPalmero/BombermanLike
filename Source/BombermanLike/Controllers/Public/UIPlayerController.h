@@ -31,6 +31,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = MenuState)
 	void StartSplashScreen();
 
+	/*! \brief Ends the widget and control over the splash
+	*
+	*	Removes and frees the widget for the splash screen
+	*/
+	UFUNCTION(BlueprintCallable, Category = MenuState)
+		void EndSplashScreen();
+
 	/*! \brief Starts the widget and control over the character selection
 	*
 	*	Creates the widget for the character selection, and starts the transition on it
@@ -38,12 +45,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = MenuState)
 	void StartCharacterSelectionScreen();
 
+	/*! \brief Ends the widget and control over the character selection
+	*
+	*	Removes and frees the widget for the character selection
+	*/
+	UFUNCTION(BlueprintCallable, Category = MenuState)
+	void EndCharacterSelectionScreen();
+
 	/*! \brief Starts the widget and control over the end match screen
 	*
 	*	Creates the widget for the end match Screen, and starts the transition on it
 	*/
 	UFUNCTION(BlueprintCallable, Category = MenuState)
 	void StartEndMatchScreen();
+
+	/*! \brief Ends the widget and control over the end match
+	*
+	*	Removes and frees the widget for the end match
+	*/
+	UFUNCTION(BlueprintCallable, Category = MenuState)
+		void EndEndMatchScreen();
 
 protected:
 	virtual void BeginPlay() override;				//<! Called when the game starts or when spawned

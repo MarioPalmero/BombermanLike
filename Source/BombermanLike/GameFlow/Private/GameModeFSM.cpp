@@ -4,12 +4,14 @@
 #include "BombermanLikeGameModeBase.h"
 
 
-GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash)
+GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash),
+	m_gameMode(nullptr)
 {
 	InitializeFunctions();
 }
 
-GameModeFSM::GameModeFSM(EGameModeStates initialState) : FSM(initialState)
+GameModeFSM::GameModeFSM(EGameModeStates initialState) : FSM(initialState),
+	m_gameMode(nullptr)
 {
 	InitializeFunctions();
 }
@@ -44,31 +46,54 @@ void GameModeFSM::InitializeFunctions()
 
 void GameModeFSM::BeginSplash(EGameModeStates previousState)
 {
-	if (m_UIController != nullptr)
+	if (m_UIControllers.Num() <= 0)
 	{
 		if (m_gameMode != nullptr)
 		{
-			m_UIController = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
-
-			if (m_UIController != nullptr)
-				m_UIController->StartSplashScreen();
+			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
+			if (controller != nullptr)
+				m_UIControllers.Add(controller);
 		}
 	}
+
+	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
+		m_UIControllers[0]->StartSplashScreen();
 }
 
 void GameModeFSM::UpdateSplash(float DeltaTime)
 {
-
 }
 
 void GameModeFSM::EndSplash(EGameModeStates nextState)
 {
+	if (m_UIControllers.Num() <= 0)
+	{
+		if (m_gameMode != nullptr)
+		{
+			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
+			if (controller != nullptr)
+				m_UIControllers.Add(controller);
+		}
+	}
 
+	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
+		m_UIControllers[0]->EndSplashScreen();
 }
 
 void GameModeFSM::BeginCharacterSelection(EGameModeStates previousState)
 {
+	if (m_UIControllers.Num() <= 0)
+	{
+		if (m_gameMode != nullptr)
+		{
+			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
+			if (controller != nullptr)
+				m_UIControllers.Add(controller);
+		}
+	}
 
+	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
+		m_UIControllers[0]->StartCharacterSelectionScreen();
 }
 
 void GameModeFSM::UpdateCharacterSelection(float DeltaTime)
@@ -78,12 +103,39 @@ void GameModeFSM::UpdateCharacterSelection(float DeltaTime)
 
 void GameModeFSM::EndCharacterSelection(EGameModeStates nextState)
 {
+	if (m_UIControllers.Num() <= 0)
+	{
+		if (m_gameMode != nullptr)
+		{
+			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
+			if (controller != nullptr)
+				m_UIControllers.Add(controller);
+		}
+	}
 
+	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
+		m_UIControllers[0]->EndCharacterSelectionScreen();
 }
 
 void GameModeFSM::BeginMatch(EGameModeStates previousState)
 {
+	if (previousState != EGameModeStates::Match)
+	{
+		if (m_gameMode != nullptr)
+		{
+			// Should only be executed the first match
+			while (m_matchControllers.Num() < m_UIControllers.Num())
+			{
+				m_matchControllers.Add(m_gameMode->GetWorld()->SpawnActor<AMatchPlayerController>(AMatchPlayerController::StaticClass()));
+			}
 
+			// Swaping UI controllers by Match controllers
+			for (int controllerIndex = 0; controllerIndex < m_matchControllers.Num() && controllerIndex < m_UIControllers.Num(); ++controllerIndex)
+			{
+				ABombermanLikeGameModeBase::SwapPlayerController(m_UIControllers[controllerIndex]->GetPawn(), m_matchControllers[controllerIndex]);
+			}
+		}
+	}
 }
 
 void GameModeFSM::UpdateMatch(float DeltaTime)
