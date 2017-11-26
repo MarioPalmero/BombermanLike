@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFlow/Public/GameModeFSM.h"
+#include "Controllers/Public/UIPlayerController.h"
 #include "BombermanLikeGameModeBase.generated.h"
 
 /*! \brief Main Game Mode for the Bomberman-Like game
@@ -34,10 +35,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = PlayerController)
 	static void SwapPlayerController(APawn* pawn, APlayerController* newPlayerController);
 
-	ABombermanLikeGameModeBase();
-	~ABombermanLikeGameModeBase();
+	ABombermanLikeGameModeBase();		//<! Constructor
+	~ABombermanLikeGameModeBase();		//<! Destructor
 
 	virtual void Tick(float DeltaSeconds) override; //<! Function called every frame
+
+protected:
+	virtual void BeginPlay() override;				//<! Called when the game starts or when spawned
+
 private:
 	GameModeFSM* m_gameState; //<! Main State of the game
 };

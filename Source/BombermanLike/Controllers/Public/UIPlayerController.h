@@ -6,6 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "UIPlayerController.generated.h"
 
+/////////////////////////////////////////////////
+///FORWARD DECLARATIONS
+/////////////////////////////////////////////////
+class UMenuUserWidget;
+
 /*! \brief Controller for the UI part of the game (Splash, Character Selection and EndMatch)
  * 
  * This controller has functionality for the UI sections of the game and has no AI counterpart.
@@ -16,9 +21,46 @@ class BOMBERMANLIKE_API AUIPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	AUIPlayerController();		//<! Constructor
+
+	/*! \brief Starts the widget and control over the splash Screen
+	 *
+	 *	Creates the widget for the splash Screen, and starts the transition on it 
+	 */
+	UFUNCTION(BlueprintCallable, Category = MenuState)
+	void StartSplashScreen();
+
+	/*! \brief Starts the widget and control over the character selection
+	*
+	*	Creates the widget for the character selection, and starts the transition on it
+	*/
+	UFUNCTION(BlueprintCallable, Category = MenuState)
+	void StartCharacterSelectionScreen();
+
+	/*! \brief Starts the widget and control over the end match screen
+	*
+	*	Creates the widget for the end match Screen, and starts the transition on it
+	*/
+	UFUNCTION(BlueprintCallable, Category = MenuState)
+	void StartEndMatchScreen();
+
 protected:
+	virtual void BeginPlay() override;				//<! Called when the game starts or when spawned
 	virtual void SetupInputComponent() override;	//<! Method for setting up the key bindings
+
 private:
 	UFUNCTION()
-	void Continue();
+	void AnyKeyReleased();		//<! Method that handles any key being pressed
+	UFUNCTION()
+	void Continue();			//<! Method to accept or continue
+
+	TSubclassOf<UUserWidget> m_splashWidgetClass;				//<! Class for the widget that handles the splash screen
+	TSubclassOf<UUserWidget> m_characterSelectionWidgetClass;	//<! Class for the widget that handles the character selection
+	TSubclassOf<UUserWidget> m_endMatchWidgetClass;				//<! Class for the widget that handles the end match screen
+
+	UMenuUserWidget* m_splashWidget;					//<! Widget that handles the splash screen
+	UMenuUserWidget* m_characterSelectionWidget;		//<! Widget that manages the character selection
+	UMenuUserWidget* m_endMatchWidget;					//<! Widget that handles the end match screen
+
 };

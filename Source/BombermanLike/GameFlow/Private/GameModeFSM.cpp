@@ -1,6 +1,7 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "GameFlow/Public/GameModeFSM.h"
+#include "BombermanLikeGameModeBase.h"
 
 
 GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash)
@@ -11,6 +12,11 @@ GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash)
 GameModeFSM::GameModeFSM(EGameModeStates initialState) : FSM(initialState)
 {
 	InitializeFunctions();
+}
+
+void GameModeFSM::Initialize(ABombermanLikeGameModeBase * gameMode)
+{
+	m_gameMode = gameMode;
 }
 
 void GameModeFSM::InitializeFunctions()
@@ -38,7 +44,16 @@ void GameModeFSM::InitializeFunctions()
 
 void GameModeFSM::BeginSplash(EGameModeStates previousState)
 {
+	if (m_UIController != nullptr)
+	{
+		if (m_gameMode != nullptr)
+		{
+			m_UIController = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
 
+			if (m_UIController != nullptr)
+				m_UIController->StartSplashScreen();
+		}
+	}
 }
 
 void GameModeFSM::UpdateSplash(float DeltaTime)

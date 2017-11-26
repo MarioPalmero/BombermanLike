@@ -1,7 +1,6 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "BombermanLikeGameModeBase.h"
-#include "Controllers/Public/UIPlayerController.h"
 #include "Pawns/Public/BombermanPawn.h"
 
 ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super()
@@ -59,5 +58,15 @@ void ABombermanLikeGameModeBase::SwapPlayerController(APawn * pawn, APlayerContr
 
 void ABombermanLikeGameModeBase::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 	m_gameState->Update(DeltaSeconds);
+}
+
+void ABombermanLikeGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	m_gameState->Initialize(this);
+	m_gameState->SetState(EGameModeStates::Splash);
 }
