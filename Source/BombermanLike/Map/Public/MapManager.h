@@ -65,6 +65,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Map)
 	FVector GetTilePosition(int column, int row) const;
 
+	/*! \brief Calculates the cell where the input position is located
+	 *
+	 * Converts a location into a cell coordinate (column, row)
+	 * If it's outside boundaries will return -1 in the coordinate
+	 */
+	UFUNCTION(BlueprintCallable, Category = Map)
+	FVector2D GetCoordinatesByLocation(FVector inputLocation) const;
+
+	/*! \brief Returns the type of tile of a cell
+	*
+	* Looks up for the content of a cell
+	*/
+	UFUNCTION(BlueprintCallable, Category = Map)
+	EMapCellType GetCellTYpeByCoordinates(int column, int row) const;
+
 	AMapManager();		//<! Constructor
 
 protected:

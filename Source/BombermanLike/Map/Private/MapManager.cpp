@@ -62,6 +62,33 @@ FVector AMapManager::GetTilePosition(int column, int row) const
 	return blockLocation;
 }
 
+FVector2D AMapManager::GetCoordinatesByLocation(FVector inputLocation) const
+{
+	// Base change to put the input position into the map coordinates
+	FVector location = GetActorQuat().Inverse() * (inputLocation - GetActorLocation());
+
+	// Calculate the column
+	if (FMath::Abs(location.X) >= Columns * 0.5f * TileSize)
+		return FVector2D(-1.0f, -1.0f);
+	int column = FMath::FloorToInt(Columns * 0.5f + inputLocation.X / TileSize);
+
+	// Calculate the row
+	if (FMath::Abs(location.Y) >= Rows * 0.5f * TileSize)
+		return FVector2D(-1.0f, -1.0f);
+	int row = FMath::FloorToInt(Rows * 0.5f + inputLocation.Y / TileSize);
+
+	return FVector2D(column, row);
+}
+
+EMapCellType AMapManager::GetCellTYpeByCoordinates(int column, int row) const
+{
+	// Check that we don't access to invalid indices
+	ensure(column >= 0 && column < m_map.size());
+	ensure(row >= 0 && m_map[column].size() > 0 && row < m_map[column].size());
+
+	return m_map[column][row];
+}
+
 void AMapManager::BeginPlay()
 {
 	InitializeGrid();

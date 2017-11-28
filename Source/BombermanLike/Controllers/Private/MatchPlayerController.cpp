@@ -13,13 +13,13 @@ AMatchPlayerController::AMatchPlayerController() : Super(),
 void AMatchPlayerController::Tick(float DeltaTime)
 {
 	if (m_bWalkUpPressed)
-		m_movementInput.Y += 1.0f;
-	if (m_bWalkDownPressed)
 		m_movementInput.Y -= 1.0f;
+	if (m_bWalkDownPressed)
+		m_movementInput.Y += 1.0f;
 	if (m_bWalkLeftPressed)
-		m_movementInput.X -= 1.0f;
-	if (m_bWalkRightPressed)
 		m_movementInput.X += 1.0f;
+	if (m_bWalkRightPressed)
+		m_movementInput.X -= 1.0f;
 
 
 	ABombermanPawn* pawn = Cast<ABombermanPawn>(GetPawn());
