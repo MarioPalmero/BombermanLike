@@ -1,13 +1,17 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "BombermanLikeGameModeBase.h"
+#include "ConstructorHelpers.h"
 #include "Pawns/Public/BombermanPawn.h"
 
 ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super()
 {
 	// Initial Classes Set up
-	PlayerControllerClass = AUIPlayerController::StaticClass();
-	DefaultPawnClass = ABombermanPawn::StaticClass();
+	PlayerControllerClass = AUIPlayerController::StaticClass(); 
+
+	static ConstructorHelpers::FClassFinder<ABombermanPawn> pawnLoader(TEXT("Blueprint'/Game/Gameplay/Core/BP_BombermanPawn.BP_BombermanPawn_C'"));
+	if (pawnLoader.Class != nullptr)
+		DefaultPawnClass = pawnLoader.Class;
 
 	// Following RAII we initialize and destroy resources properly
 	m_gameState = new GameModeFSM();
@@ -50,10 +54,13 @@ void ABombermanLikeGameModeBase::SwapPlayerController(APawn * pawn, APlayerContr
 				newPlayerController->SetPlayer(player);
 				oldPlayerController->SetActorTickEnabled(false);
 
+				AActor* oldViewTarget = oldPlayerController->GetViewTarget();
+
 				// Possess the pawn with the new controller and acknowledge it
 				newPlayerController->Possess(pawn);
 				newPlayerController->AcknowledgePossession(pawn);
 				newPlayerController->SetActorTickEnabled(true);
+				newPlayerController->SetViewTarget(oldViewTarget);
 
 				// Clean old input component
 				if (oldPlayerController->InputComponent)
