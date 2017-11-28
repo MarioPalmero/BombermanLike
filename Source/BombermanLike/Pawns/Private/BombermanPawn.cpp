@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Gameplay/Components/Damageable/Public/DamageableComponent.h"
 
 
 ABombermanPawn::ABombermanPawn() : Super(),
@@ -26,6 +27,8 @@ ABombermanPawn::ABombermanPawn() : Super(),
 
 	m_movementComponent = CreateDefaultSubobject<UPawnMovementComponent, UFloatingPawnMovement>("Movement");
 	m_movementComponent->UpdatedComponent = m_collisionComponent;
+
+	DamageableComponent = CreateDefaultSubobject<UDamageableComponent>("Damageable");
 }
 
 void ABombermanPawn::Tick(float DeltaTime)

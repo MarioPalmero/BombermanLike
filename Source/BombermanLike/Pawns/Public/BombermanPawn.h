@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 class USphereComponent;
 class UPawnMovementComponent;
+class UDamageableComponent;
 
 /*! \brief Class that represents a Bomberman
  *
@@ -22,8 +23,12 @@ class BOMBERMANLIKE_API ABombermanPawn : public APawn
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	UDamageableComponent* DamageableComponent;		//<! Component for managing damage
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-	float Speed;		//<! MEasures the amount of space for time unit that the pawn can move
+	float Speed;		//<! Measures the amount of space for time unit that the pawn can move
 
 	/*! \brief Moves the pawn
 	 *
