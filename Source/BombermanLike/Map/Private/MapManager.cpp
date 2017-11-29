@@ -1,8 +1,11 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "Map/Public/MapManager.h"
+#include "EngineUtils.h"
 #include "ConstructorHelpers.h"
 
+AMapManager* AMapManager::m_mapInstance = nullptr;
+UWorld* AMapManager::m_world = nullptr;
 
 AMapManager::AMapManager() : Super()
 {
@@ -11,6 +14,27 @@ AMapManager::AMapManager() : Super()
 		IndestructibleBlock = indestructibleBlockObject.Object->GeneratedClass;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
+
+#if WITH_EDITOR
+	m_mapInstance = nullptr;
+#endif
+}
+
+AMapManager * AMapManager::GetInstance()
+{
+	if (m_mapInstance != nullptr)
+		return m_mapInstance;
+
+	if (m_world != nullptr)
+	{
+		for (TActorIterator<AMapManager> MapItr(m_world); MapItr; ++MapItr)
+		{
+			m_mapInstance = *MapItr;
+			return m_mapInstance;
+		}
+	}
+
+	return nullptr;
 }
 
 void AMapManager::InitializeGrid()
@@ -80,7 +104,7 @@ FVector2D AMapManager::GetCoordinatesByLocation(FVector inputLocation) const
 	return FVector2D(column, row);
 }
 
-EMapCellType AMapManager::GetCellTYpeByCoordinates(int column, int row) const
+EMapCellType AMapManager::GetCellTypeByCoordinates(int column, int row) const
 {
 	// Check that we don't access to invalid indices
 	ensure(column >= 0 && column < m_map.size());
@@ -89,8 +113,91 @@ EMapCellType AMapManager::GetCellTYpeByCoordinates(int column, int row) const
 	return m_map[column][row];
 }
 
+TArray<FVector> AMapManager::GetExplosionLocations(FVector location, int flameLength) const
+{
+	FVector2D explosionCoordinates = GetCoordinatesByLocation(location);
+	TArray<FVector> flamePositions;
+	// The centre should always be set on fire (flameLength == 1)
+	flamePositions.Add(GetTilePosition(explosionCoordinates.X, explosionCoordinates.Y));
+
+	// First towards the top of the map
+	for (int flamePosition = 1; flamePosition < flameLength; ++flamePosition)
+	{
+		// If we reached the top of the map, break
+		if (explosionCoordinates.Y - flamePosition < 0)
+			break;
+
+		EMapCellType cellType = GetCellTypeByCoordinates(explosionCoordinates.X, explosionCoordinates.Y - flamePosition);
+		// If the cell has an indestructible block, break
+		if (cellType == EMapCellType::IndestructibleBlock)
+			break;
+		// Put flame in this position
+		flamePositions.Add(GetTilePosition(explosionCoordinates.X, explosionCoordinates.Y - flamePosition));
+		// But if there were a destructible block we shouldn't keep on
+		if (cellType == EMapCellType::DestructibleBlock)
+			break;
+	}
+
+	// Second, towards the bottom of the map
+	for (int flamePosition = 1; flamePosition < flameLength; ++flamePosition)
+	{
+		// If we reached the bottom of the map, break
+		if (explosionCoordinates.Y + flamePosition >= m_map[explosionCoordinates.X].size())
+			break;
+
+		EMapCellType cellType = GetCellTypeByCoordinates(explosionCoordinates.X, explosionCoordinates.Y + flamePosition);
+		// If the cell has an indestructible block, break
+		if (cellType == EMapCellType::IndestructibleBlock)
+			break;
+		// Put flame in this position
+		flamePositions.Add(GetTilePosition(explosionCoordinates.X, explosionCoordinates.Y + flamePosition));
+		// But if there were a destructible block we shouldn't keep on
+		if (cellType == EMapCellType::DestructibleBlock)
+			break;
+	}
+
+	// Third, towards the left of the map
+	for (int flamePosition = 1; flamePosition < flameLength; ++flamePosition)
+	{
+		// If we reached the left limit of the map, break
+		if (explosionCoordinates.X - flamePosition < 0)
+			break;
+
+		EMapCellType cellType = GetCellTypeByCoordinates(explosionCoordinates.X - flamePosition, explosionCoordinates.Y);
+		// If the cell has an indestructible block, break
+		if (cellType == EMapCellType::IndestructibleBlock)
+			break;
+		// Put flame in this position
+		flamePositions.Add(GetTilePosition(explosionCoordinates.X - flamePosition, explosionCoordinates.Y));
+		// But if there were a destructible block we shouldn't keep on
+		if (cellType == EMapCellType::DestructibleBlock)
+			break;
+	}
+
+	// Forth, towards the right of the map
+	for (int flamePosition = 1; flamePosition < flameLength; ++flamePosition)
+	{
+		// If we reached the right limit of the map, break
+		if (explosionCoordinates.X + flamePosition >= m_map.size())
+			break;
+
+		EMapCellType cellType = GetCellTypeByCoordinates(explosionCoordinates.X + flamePosition, explosionCoordinates.Y);
+		// If the cell has an indestructible block, break
+		if (cellType == EMapCellType::IndestructibleBlock)
+			break;
+		// Put flame in this position
+		flamePositions.Add(GetTilePosition(explosionCoordinates.X + flamePosition, explosionCoordinates.Y));
+		// But if there were a destructible block we shouldn't keep on
+		if (cellType == EMapCellType::DestructibleBlock)
+			break;
+	}
+
+	return flamePositions;
+}
+
 void AMapManager::BeginPlay()
 {
+	m_world = GetWorld();
 	InitializeGrid();
 	PlaceIndestructibleBlocks();
 }

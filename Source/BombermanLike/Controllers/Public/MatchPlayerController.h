@@ -40,6 +40,8 @@ private:
 	void WalkRightPressed();			//<! Processess the input of the WalkRight action being pressed
 	UFUNCTION()
 	void WalkRightReleased();			//<! Processess the input of the WalkRight action being released
+	UFUNCTION()
+	void PlaceBombReleased();			//<! Processess the input of the PlaceBomb action being released
 
 	FVector m_movementInput;	//<! Accumulates all the movement input
 	bool m_bWalkUpPressed;		//<! Indicates if the key for WalkUp is pressed

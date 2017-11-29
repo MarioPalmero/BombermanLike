@@ -16,7 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResurrection);	//<! Delegate type creation
  *
  * Component that handles actors being damaged and destroyed
  */
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UDamageableComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -54,9 +54,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Damage)
 	void Heal(float damageAmount);
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Damage")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Damage)
 	FOnDeath OnDeath;					//<! Delegate to notify death
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Damage")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Damage)
 	FOnResurrection OnResurrection;		//<! Delegate to notify resurrection
 
 	UDamageableComponent();				//<! Constructor

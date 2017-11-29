@@ -14,10 +14,7 @@ enum EMapCellType
 {
 	Empty,
 	IndestructibleBlock,
-	DestructibleBlock,
-	PowerUp,
-	Bomb,
-	Fire
+	DestructibleBlock
 };
 
 /*! \brief Class that handles creation, progress and destruction of the map during a match
@@ -78,12 +75,25 @@ public:
 	* Looks up for the content of a cell
 	*/
 	UFUNCTION(BlueprintCallable, Category = Map)
-	EMapCellType GetCellTYpeByCoordinates(int column, int row) const;
+	EMapCellType GetCellTypeByCoordinates(int column, int row) const;
+
+	/*! \brief Returns the locations where an explosion should set fire
+	*
+	* With the length parameter and the position this function return the cells where
+	* a fire actor should be placed
+	*/
+	UFUNCTION(BlueprintCallable, Category = Map)
+	TArray<FVector> GetExplosionLocations(FVector location, int flameLength) const;
 
 	AMapManager();		//<! Constructor
 
+	static AMapManager* GetInstance();		//<! Returns a reference to the map
 protected:
 	virtual void BeginPlay() override;				//<! Called when the game starts or when spawned
+
 private:
+	static AMapManager* m_mapInstance;				//<! Instance of the map
+	static UWorld* m_world;							//<! Reference to the world
+
 	std::vector<std::vector<EMapCellType>> m_map;		//<! The abstraction of the physical map
 };

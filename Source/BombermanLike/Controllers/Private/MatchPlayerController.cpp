@@ -46,6 +46,7 @@ void AMatchPlayerController::SetupInputComponent()
 	InputComponent->BindAction(*("WalkLeft" + sufix), IE_Released, this, &AMatchPlayerController::WalkLeftReleased);
 	InputComponent->BindAction(*("WalkRight" + sufix), IE_Pressed, this, &AMatchPlayerController::WalkRightPressed);
 	InputComponent->BindAction(*("WalkRight" + sufix), IE_Released, this, &AMatchPlayerController::WalkRightReleased);
+	InputComponent->BindAction(*("PlaceBomb" + sufix), IE_Released, this, &AMatchPlayerController::PlaceBombReleased);
 }
 
 void AMatchPlayerController::WalkUpPressed()
@@ -86,4 +87,13 @@ void AMatchPlayerController::WalkRightPressed()
 void AMatchPlayerController::WalkRightReleased()
 {
 	m_bWalkRightPressed = false;
+}
+
+void AMatchPlayerController::PlaceBombReleased()
+{
+	ABombermanPawn* pawn = Cast<ABombermanPawn>(GetPawn());
+	if (pawn != nullptr)
+	{
+		pawn->PlaceBomb();
+	}
 }
