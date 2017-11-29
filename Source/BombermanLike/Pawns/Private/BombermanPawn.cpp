@@ -12,9 +12,7 @@
 
 ABombermanPawn::ABombermanPawn() : Super(),
 	BaseBombAmount(1),
-	Speed(10.0f),
-	m_currentBombsMax(BaseBombAmount),
-	m_currentBombsLeft(m_currentBombsMax)
+	Speed(10.0f)
 {
  	// Set this pawn to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
@@ -54,6 +52,8 @@ void ABombermanPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_currentBombsMax = BaseBombAmount;
+	m_currentBombsLeft = m_currentBombsMax;
 		
 }
 
@@ -76,7 +76,10 @@ void ABombermanPawn::PlaceBomb()
 
 			UExplodableComponent* explodable = Cast<UExplodableComponent>(bomb->GetComponentByClass(UExplodableComponent::StaticClass()));
 			if (explodable != nullptr)
+			{
 				explodable->InitiateCountdown();
+				explodable->OnExplosion.AddDynamic(this, &ABombermanPawn::RecoverBomb);
+			}
 			// Reduce number of bombs
 			--m_currentBombsLeft;
 		}
@@ -89,8 +92,14 @@ void ABombermanPawn::IncreaseMaxNumberOFBombs(int amount)
 	++m_currentBombsLeft;
 }
 
-void ABombermanPawn::RecoverBomb()
+void ABombermanPawn::RecoverBomb(UExplodableComponent* explodable)
 {
+	if (explodable->OnExplosion.IsBound())
+	{
+		explodable->OnExplosion.RemoveDynamic(this, &ABombermanPawn::RecoverBomb);
+		explodable->GetOwner()->Destroy();
+	}
+
 	m_currentBombsLeft = FMath::Min(m_currentBombsMax, m_currentBombsLeft + 1);
 }
 

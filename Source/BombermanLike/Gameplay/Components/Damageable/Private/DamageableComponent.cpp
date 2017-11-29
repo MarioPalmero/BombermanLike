@@ -16,7 +16,7 @@ float UDamageableComponent::GetCurrentHealth()
 
 void UDamageableComponent::Damage(float damageAmount)
 {
-	bool bNotifyDeath = m_currentHealth - damageAmount <= 0.0f;
+	bool bNotifyDeath = m_currentHealth > 0.0f && m_currentHealth - damageAmount <= 0.0f;
 
 	if (MaxHealth >= 0.0f)
 		m_currentHealth = FMath::Clamp(m_currentHealth - damageAmount, 0.0f, MaxHealth);

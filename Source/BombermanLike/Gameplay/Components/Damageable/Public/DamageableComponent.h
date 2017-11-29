@@ -60,6 +60,7 @@ public:
 	FOnResurrection OnResurrection;		//<! Delegate to notify resurrection
 
 	UDamageableComponent();				//<! Constructor
+	
 private:
 	float m_currentHealth;				//<! Current life of the owner
 };

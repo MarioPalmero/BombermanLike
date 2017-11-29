@@ -3,6 +3,7 @@
 #include "Gameplay/Components/Explodable/Public/ExplodableComponent.h"
 #include "ConstructorHelpers.h"
 #include "Map/Public/MapManager.h"
+#include "Gameplay/Components/Damageable/Public/DamageableComponent.h"
 
 UExplodableComponent::UExplodableComponent() : Super(),
 	BaseTimer(2.0f),
@@ -36,6 +37,10 @@ void UExplodableComponent::InitiateCountdown()
 
 void UExplodableComponent::Detonate()
 {
+	UDamageableComponent* damageable = Cast<UDamageableComponent>(GetOwner()->GetComponentByClass(UDamageableComponent::StaticClass()));
+	if (damageable != nullptr)
+		damageable->DestroyComponent();
+
 	TArray<FVector> fireLocations = AMapManager::GetInstance()->GetExplosionLocations(GetOwner()->GetActorLocation(), m_currentFlameLength);
 
 	for (auto location : fireLocations)
@@ -44,8 +49,8 @@ void UExplodableComponent::Detonate()
 		AActor* flame = GetWorld()->SpawnActor<AActor>(FlameClass);
 		flame->SetActorLocation(location);
 	}
-
-	OnExplosion.Broadcast();
+	
+	OnExplosion.Broadcast(this);
 }
 
 

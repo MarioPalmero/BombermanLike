@@ -61,7 +61,7 @@ public:
 	* Once a bomb has explode we can place another one again
 	*/
 	UFUNCTION(BlueprintCallable, Category = Movemet)
-	void RecoverBomb();
+	void RecoverBomb(UExplodableComponent* explodable);
 
 	/*! \brief Resets the max number of bombs to the base amount
 	*

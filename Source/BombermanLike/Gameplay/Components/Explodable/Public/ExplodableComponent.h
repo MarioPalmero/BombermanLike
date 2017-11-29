@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 ///DELEGATES
 /////////////////////////////////////////////////
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExplosion);			//<! Delegate type creation for explosion event
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnExplosion, UExplodableComponent*, bomb);		//<! Delegate type creation for explosion event
 
 /*! \brief Component for those that can explode
  *
