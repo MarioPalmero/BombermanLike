@@ -75,6 +75,8 @@ private:
 	void AnyKeyReleased();		//<! Method that handles any key being pressed
 	UFUNCTION()
 	void Continue();			//<! Method to accept or continue
+	UFUNCTION()
+	void CreatePlayer2();		//<! Creates the second player
 
 	TSubclassOf<UUserWidget> m_splashWidgetClass;				//<! Class for the widget that handles the splash screen
 	TSubclassOf<UUserWidget> m_characterSelectionWidgetClass;	//<! Class for the widget that handles the character selection

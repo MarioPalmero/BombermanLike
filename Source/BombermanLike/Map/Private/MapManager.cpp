@@ -7,11 +7,19 @@
 AMapManager* AMapManager::m_mapInstance = nullptr;
 UWorld* AMapManager::m_world = nullptr;
 
-AMapManager::AMapManager() : Super()
+AMapManager::AMapManager() : Super(),
+	TileSize(100.0f),
+	Columns(11),
+	Rows(11),
+	DestructibleApparitionProbability(0.5f)
 {
 	static ConstructorHelpers::FObjectFinder<UBlueprint> indestructibleBlockObject(TEXT("Blueprint'/Game/Environment/Blueprints/BP_IndestructibleBlock.BP_IndestructibleBlock'"));
 	if (indestructibleBlockObject.Object != nullptr)
 		IndestructibleBlock = indestructibleBlockObject.Object->GeneratedClass;
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> destructibleBlockObject(TEXT("Blueprint'/Game/Gameplay/Items/Blueprints/BP_DestructibleBlock.BP_DestructibleBlock'"));
+	if (destructibleBlockObject.Object != nullptr)
+		DestructibleBlock = destructibleBlockObject.Object->GeneratedClass;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
 
@@ -72,6 +80,31 @@ void AMapManager::PlaceIndestructibleBlocks()
 
 				AActor* block = GetWorld()->SpawnActor<AActor>(IndestructibleBlock);
 				block->SetActorLocation(GetTilePosition(indexColumns, indexRows));
+			}
+		}
+	}
+}
+
+void AMapManager::PlaceDestructibleBlocks()
+{
+	for (int indexRows = 0; indexRows < Rows; ++indexRows)
+	{
+		for (int indexColumns = 0; indexColumns < Columns; ++indexColumns)
+		{
+			bool bTooCloseToPlayer = indexRows <= 1 && indexColumns <= 1 ||
+									 indexRows >= Rows - 2 && indexColumns <= 1 ||
+									 indexRows <= 1 && indexColumns >= Columns - 2 ||
+									 indexRows >= Rows - 2 && indexColumns >= Columns - 2;
+			if (!bTooCloseToPlayer && (indexColumns % 2 == 0 || indexRows % 2 == 0))
+			{
+				if (FMath::RandRange(0.0f, 1.0f) < DestructibleApparitionProbability)
+				{
+					// First we create the blocks in the abstract layer
+					m_map[indexRows][indexColumns] = EMapCellType::DestructibleBlock;
+
+					AActor* block = GetWorld()->SpawnActor<AActor>(DestructibleBlock);
+					block->SetActorLocation(GetTilePosition(indexColumns, indexRows));
+				}
 			}
 		}
 	}
@@ -193,6 +226,16 @@ TArray<FVector> AMapManager::GetExplosionLocations(FVector location, int flameLe
 	}
 
 	return flamePositions;
+}
+
+void AMapManager::NotifyDestructionOfDestructibleBlock(FVector location)
+{
+	FVector2D coordinates = GetCoordinatesByLocation(location);
+	if (coordinates.X < m_map.size() && coordinates.Y < m_map[coordinates.X].size())
+	{
+		if (m_map[coordinates.X][coordinates.Y] == EMapCellType::DestructibleBlock)
+			m_map[coordinates.X][coordinates.Y] = EMapCellType::Empty;
+	}
 }
 
 void AMapManager::BeginPlay()

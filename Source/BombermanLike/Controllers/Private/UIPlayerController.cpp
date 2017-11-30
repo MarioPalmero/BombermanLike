@@ -5,6 +5,7 @@
 #include "BombermanLikeGameModeBase.h"
 #include "ConstructorHelpers.h"
 #include "UI/Widgets/Public/MenuUserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 AUIPlayerController::AUIPlayerController() : Super(),
 	m_splashWidget(nullptr),
@@ -44,9 +45,9 @@ void AUIPlayerController::SetupInputComponent()
 	// Binding the any key action
 	InputComponent->BindAction("AnyKey", IE_Released, this, &AUIPlayerController::AnyKeyReleased);
 
-	FString sufix = FString::FromInt(GetLocalPlayer()->GetControllerId() + 1);
 	// Bind buttons to actions
-	InputComponent->BindAction(*FString("Continue" + sufix), IE_Released, this, &AUIPlayerController::Continue);
+	InputComponent->BindAction(*FString("Continue1"), IE_Released, this, &AUIPlayerController::Continue);
+	InputComponent->BindAction(*FString("Continue2"), IE_Released, this, &AUIPlayerController::CreatePlayer2);
 }
 
 void AUIPlayerController::StartSplashScreen()
@@ -135,4 +136,10 @@ void AUIPlayerController::Continue()
 			m_characterSelectionWidget->EndCharacterSelection();
 		}
 	}
+}
+
+void AUIPlayerController::CreatePlayer2()
+{
+	UGameplayStatics::CreatePlayer(GetWorld(), 1);
+
 }

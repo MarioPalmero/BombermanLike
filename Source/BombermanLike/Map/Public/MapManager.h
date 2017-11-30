@@ -37,8 +37,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Map)
 	int Rows;			//<! Indicates the current number of rows. The map will generate this number of rows when initializing.
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Map)
+	float DestructibleApparitionProbability;			//<! 0 to 1 probability of a destructible appearing in an empty cell
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = MapCreation)
 	UClass* IndestructibleBlock;	//<! Class for the indestructible blocks to spawn
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = MapCreation)
+	UClass* DestructibleBlock;	//<! Class for the destructible blocks to spawn
 
 	/*! \brief Initializes the grid
 	*
@@ -53,6 +59,13 @@ public:
 	 */
 	UFUNCTION()
 	void PlaceIndestructibleBlocks();
+
+	/*! \brief Creates destructible blocks around the grid
+	*
+	* Method that fills the map with destructible blocks avoiding player start
+	*/
+	UFUNCTION()
+	void PlaceDestructibleBlocks();
 
 	/*! \brief Returns the position in world of a tile object
 	 *
@@ -85,8 +98,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Map)
 	TArray<FVector> GetExplosionLocations(FVector location, int flameLength) const;
 
+	/*! \brief Notifies the map that a destructible block has been destructed
+	*
+	* The map updates the abstract with the position info, empting the cell if there was a destructible block
+	*/
+	UFUNCTION(BlueprintCallable, Category = Map)
+	void NotifyDestructionOfDestructibleBlock(FVector location);
+
 	AMapManager();		//<! Constructor
 
+	UFUNCTION(BlueprintCallable, Category = Map)
 	static AMapManager* GetInstance();		//<! Returns a reference to the map
 protected:
 	virtual void BeginPlay() override;				//<! Called when the game starts or when spawned

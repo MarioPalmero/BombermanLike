@@ -1,6 +1,7 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "BombermanLikeGameModeBase.h"
+#include "Engine.h"
 #include "ConstructorHelpers.h"
 #include "Pawns/Public/BombermanPawn.h"
 

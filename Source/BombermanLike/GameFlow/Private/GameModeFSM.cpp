@@ -1,7 +1,10 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "GameFlow/Public/GameModeFSM.h"
+#include "EngineUtils.h"
 #include "BombermanLikeGameModeBase.h"
+#include "Map/Public/MapManager.h"
+#include "Kismet/GameplayStatics.h"
 
 
 GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash),
@@ -113,6 +116,13 @@ void GameModeFSM::EndCharacterSelection(EGameModeStates nextState)
 		}
 	}
 
+	// Check if the number of players don't match with the number of registered controllers
+	while (m_UIControllers.Num() < m_gameMode->GetNumPlayers())
+	{
+		AUIPlayerController* controller = Cast<AUIPlayerController>(UGameplayStatics::GetPlayerController(m_gameMode->GetWorld(), m_UIControllers.Num()));
+		m_UIControllers.Add(controller);
+	}
+
 	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
 		m_UIControllers[0]->EndCharacterSelectionScreen();
 }
@@ -134,6 +144,8 @@ void GameModeFSM::BeginMatch(EGameModeStates previousState)
 			{
 				ABombermanLikeGameModeBase::SwapPlayerController(m_UIControllers[controllerIndex]->GetPawn(), m_matchControllers[controllerIndex]);
 			}
+
+			AMapManager::GetInstance()->PlaceDestructibleBlocks();
 		}
 	}
 }
