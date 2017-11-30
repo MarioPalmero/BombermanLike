@@ -49,16 +49,18 @@ void ABombermanPawn::Tick(float DeltaTime)
 
 }
 
+void ABombermanPawn::PossessedBy(AController* NewController)
+{
+	if (Cast<APlayerController>(NewController)->GetLocalPlayer()->GetControllerId() > 0)
+		m_collisionComponent->SetCollisionProfileName("Player2");
+}
+
 void ABombermanPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
 	m_currentBombsMax = BombAmount;
 	m_currentBombsLeft = m_currentBombsMax;
-
-	if (Cast<APlayerController>(GetController())->GetLocalPlayer()->GetControllerId() > 0)
-		m_collisionComponent->SetCollisionProfileName("Player2");
-		
 }
 
 void ABombermanPawn::Move(FVector movementAmount)
@@ -92,7 +94,7 @@ void ABombermanPawn::PlaceBomb()
 			int id = Cast<APlayerController>(GetController())->GetLocalPlayer()->GetControllerId();
 			UPrimitiveComponent* primitive = Cast<UPrimitiveComponent>(bomb->GetComponentByClass(UPrimitiveComponent::StaticClass()));
 			if (primitive != nullptr)
-					primitive->SetCollisionResponseToChannel(id == 0 ? ECollisionChannel::ECC_GameTraceChannel2 : ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
+					primitive->SetCollisionResponseToChannel(id == 0 ? ECollisionChannel::ECC_GameTraceChannel2 : ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 		}
 	}
 }

@@ -81,6 +81,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;	//<! Called every frames
 
+	virtual void PossessedBy(AController* NewController) override;	//<! Called when the pawn is possessed by a controller
 protected:
 	virtual void BeginPlay() override;	//<! Called when the game starts or when spawned
 
