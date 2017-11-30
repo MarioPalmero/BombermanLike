@@ -11,8 +11,9 @@
 #include "Map/Public/MapManager.h"
 
 ABombermanPawn::ABombermanPawn() : Super(),
-	BaseBombAmount(1),
-	Speed(10.0f)
+	BombAmount(1),
+	Speed(10.0f),
+	FlameLength(3)
 {
  	// Set this pawn to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,7 +21,7 @@ ABombermanPawn::ABombermanPawn() : Super(),
 	// Collision
 	m_collisionComponent = CreateDefaultSubobject<USphereComponent>("Collision");
 	m_collisionComponent->InitSphereRadius(35.0f);
-	m_collisionComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	m_collisionComponent->SetCollisionProfileName("Player1");
 
 	m_collisionComponent->CanCharacterStepUpOn = ECB_No;
 	m_collisionComponent->bShouldUpdatePhysicsVolume = true;
@@ -52,8 +53,11 @@ void ABombermanPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_currentBombsMax = BaseBombAmount;
+	m_currentBombsMax = BombAmount;
 	m_currentBombsLeft = m_currentBombsMax;
+
+	if (Cast<APlayerController>(GetController())->GetLocalPlayer()->GetControllerId() > 0)
+		m_collisionComponent->SetCollisionProfileName("Player2");
 		
 }
 
@@ -79,9 +83,16 @@ void ABombermanPawn::PlaceBomb()
 			{
 				explodable->InitiateCountdown();
 				explodable->OnExplosion.AddDynamic(this, &ABombermanPawn::RecoverBomb);
+				explodable->FlameLength = FlameLength;
 			}
 			// Reduce number of bombs
 			--m_currentBombsLeft;
+
+			// Set initial collision
+			int id = Cast<APlayerController>(GetController())->GetLocalPlayer()->GetControllerId();
+			UPrimitiveComponent* primitive = Cast<UPrimitiveComponent>(bomb->GetComponentByClass(UPrimitiveComponent::StaticClass()));
+			if (primitive != nullptr)
+					primitive->SetCollisionResponseToChannel(id == 0 ? ECollisionChannel::ECC_GameTraceChannel2 : ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
 		}
 	}
 }
@@ -105,6 +116,6 @@ void ABombermanPawn::RecoverBomb(UExplodableComponent* explodable)
 
 void ABombermanPawn::ResetMaxBombs()
 {
-	m_currentBombsLeft = BaseBombAmount;
-	m_currentBombsMax = BaseBombAmount;
+	m_currentBombsLeft = BombAmount;
+	m_currentBombsMax = BombAmount;
 }

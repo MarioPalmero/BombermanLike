@@ -14,6 +14,10 @@ class UPawnMovementComponent;
 class UDamageableComponent;
 class AMapManager;
 
+/////////////////////////////////////////////////
+///DELEGATES
+/////////////////////////////////////////////////
+
 /*! \brief Class that represents a Bomberman
  *
  * Bomberman controlled by the player or by the AI
@@ -25,7 +29,7 @@ class BOMBERMANLIKE_API ABombermanPawn : public APawn
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bombs)
-	int BaseBombAmount;		//<! Component for managing damage
+	int BombAmount;		//<! Component for managing damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bombs)
 	UClass* BombClass;		//<! Class for the bomb
 
@@ -34,6 +38,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
 	float Speed;		//<! Measures the amount of space for time unit that the pawn can move
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bombs)
+	float FlameLength;		//<! Measures the length of the flames for the bombs placed by this pawn
 	
 	/*! \brief Moves the pawn
 	 *
@@ -69,7 +76,7 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = Movemet)
 	void ResetMaxBombs();
-
+	
 	ABombermanPawn();	//<! Constructor
 
 	virtual void Tick(float DeltaTime) override;	//<! Called every frames

@@ -29,6 +29,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
 	float MaxHealth;
 
+	/*! \brief Indicates if the damageable is Invulnerable
+	*
+	* While invulnerable the damageable can't be damaged
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	bool bInvulnerable;
+
 	/*! \brief Returns the current health of the owner
 	 *
 	 * Returns current health amount of this owner

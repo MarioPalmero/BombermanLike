@@ -40,25 +40,11 @@ public:
 	* Sets the basic flame for explosions
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Explosion)
-	int BaseFlameLength;
+	int FlameLength;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Explosion)
 	UClass* FlameClass;		//<! Class for the bomb
-
-	/*! \brief Returns the current flame length
-	*
-	* Returns current flame length
-	*/
-	UFUNCTION(BlueprintCallable, Category = Explosion)
-	float GetCurrenFlameLength();
-
-	/*! \brief Increases the flame length
-	*
-	* Increases in discrete amounts the flame length.
-	*/
-	UFUNCTION(BlueprintCallable, Category = Explosion)
-	void IncreaseFlameAmount(int lengthIncrement);
-
+	
 	/*! \brief Initiates the inminent explosion
 	*
 	* Prepares the component for the countdown and the explosion
@@ -81,5 +67,4 @@ public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction) override;	//<! Every frame method
 private:
 	float m_currentTimer;				//<! Current time before explosion
-	int m_currentFlameLength;			//<! Current explosion length
 };

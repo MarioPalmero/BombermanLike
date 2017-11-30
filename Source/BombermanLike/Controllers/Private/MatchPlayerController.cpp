@@ -8,6 +8,8 @@ AMatchPlayerController::AMatchPlayerController() : Super(),
 {
 	// Set the controller to tick every frame
 	PrimaryActorTick.bCanEverTick = true;
+
+	
 }
 
 void AMatchPlayerController::Tick(float DeltaTime)

@@ -8,25 +8,14 @@
 UExplodableComponent::UExplodableComponent() : Super(),
 	BaseTimer(2.0f),
 	BaseDamage(1.0f),
-	BaseFlameLength(3),
-	m_currentTimer(-1.0f),
-	m_currentFlameLength(BaseFlameLength)
+	FlameLength(3),
+	m_currentTimer(-1.0f)
 {
 	static ConstructorHelpers::FObjectFinder<UBlueprint> flameObject(TEXT("Blueprint'/Game/Gameplay/Items/Blueprints/BP_Flame.BP_Flame'"));
 	if (flameObject.Object != nullptr)
 		FlameClass = flameObject.Object->GeneratedClass;
 
 	PrimaryComponentTick.bCanEverTick = true;
-}
-
-float UExplodableComponent::GetCurrenFlameLength()
-{
-	return m_currentFlameLength;
-}
-
-void UExplodableComponent::IncreaseFlameAmount(int lengthIncrement)
-{
-	m_currentFlameLength += lengthIncrement;
 }
 
 void UExplodableComponent::InitiateCountdown()
@@ -41,7 +30,7 @@ void UExplodableComponent::Detonate()
 	if (damageable != nullptr)
 		damageable->DestroyComponent();
 
-	TArray<FVector> fireLocations = AMapManager::GetInstance()->GetExplosionLocations(GetOwner()->GetActorLocation(), m_currentFlameLength);
+	TArray<FVector> fireLocations = AMapManager::GetInstance()->GetExplosionLocations(GetOwner()->GetActorLocation(), FlameLength);
 
 	for (auto location : fireLocations)
 	{

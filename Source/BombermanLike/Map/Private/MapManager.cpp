@@ -1,6 +1,7 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "Map/Public/MapManager.h"
+#include "Engine.h"
 #include "EngineUtils.h"
 #include "ConstructorHelpers.h"
 
@@ -143,7 +144,7 @@ EMapCellType AMapManager::GetCellTypeByCoordinates(int column, int row) const
 	ensure(column >= 0 && column < m_map.size());
 	ensure(row >= 0 && m_map[column].size() > 0 && row < m_map[column].size());
 
-	return m_map[column][row];
+	return m_map[row][column];
 }
 
 TArray<FVector> AMapManager::GetExplosionLocations(FVector location, int flameLength) const
@@ -233,8 +234,8 @@ void AMapManager::NotifyDestructionOfDestructibleBlock(FVector location)
 	FVector2D coordinates = GetCoordinatesByLocation(location);
 	if (coordinates.X < m_map.size() && coordinates.Y < m_map[coordinates.X].size())
 	{
-		if (m_map[coordinates.X][coordinates.Y] == EMapCellType::DestructibleBlock)
-			m_map[coordinates.X][coordinates.Y] = EMapCellType::Empty;
+		if (m_map[coordinates.Y][coordinates.X] == EMapCellType::DestructibleBlock)
+			m_map[coordinates.Y][coordinates.X] = EMapCellType::Empty;
 	}
 }
 
