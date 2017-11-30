@@ -27,7 +27,7 @@ void AMatchPlayerController::Tick(float DeltaTime)
 	ABombermanPawn* pawn = Cast<ABombermanPawn>(GetPawn());
 	if (pawn != nullptr)
 	{
-		pawn->Move(m_movementInput * DeltaTime * pawn->Speed);
+		pawn->Move(m_movementInput * DeltaTime * pawn->GetCurrentSpeed());
 	}
 	m_movementInput = FVector::ZeroVector;
 }

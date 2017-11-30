@@ -11,9 +11,10 @@
 #include "Map/Public/MapManager.h"
 
 ABombermanPawn::ABombermanPawn() : Super(),
-	BombAmount(1),
-	Speed(10.0f),
-	FlameLength(3)
+	BaseBombAmount(1),
+	BaseSpeed(10.0f),
+	BaseFlameLength(3),
+	bIsDead(false)
 {
  	// Set this pawn to call Tick() every frame. 
 	PrimaryActorTick.bCanEverTick = true;
@@ -59,8 +60,13 @@ void ABombermanPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_currentBombsMax = BombAmount;
+	m_currentBombsMax = BaseBombAmount;
 	m_currentBombsLeft = m_currentBombsMax;
+	m_currentSpeed = BaseSpeed;
+	m_currentFlameLength = BaseFlameLength;
+
+	// Register on the delegate for dying
+	DamageableComponent->OnDeath.AddDynamic(this, &ABombermanPawn::Kill);
 }
 
 void ABombermanPawn::Move(FVector movementAmount)
@@ -85,7 +91,7 @@ void ABombermanPawn::PlaceBomb()
 			{
 				explodable->InitiateCountdown();
 				explodable->OnExplosion.AddDynamic(this, &ABombermanPawn::RecoverBomb);
-				explodable->FlameLength = FlameLength;
+				explodable->FlameLength = m_currentFlameLength;
 			}
 			// Reduce number of bombs
 			--m_currentBombsLeft;
@@ -118,6 +124,42 @@ void ABombermanPawn::RecoverBomb(UExplodableComponent* explodable)
 
 void ABombermanPawn::ResetMaxBombs()
 {
-	m_currentBombsLeft = BombAmount;
-	m_currentBombsMax = BombAmount;
+	m_currentBombsMax = BaseBombAmount;
+	m_currentBombsLeft = m_currentBombsMax;
+}
+
+float ABombermanPawn::GetCurrentSpeed()
+{
+	return m_currentSpeed;
+}
+
+void ABombermanPawn::IncreaseCurrentSpeed(float amount)
+{
+	m_currentSpeed += amount;
+}
+
+void ABombermanPawn::IncreaseFlameLength(int amount)
+{
+	m_currentFlameLength += amount;
+}
+
+void ABombermanPawn::Kill()
+{
+	bIsDead = true;
+
+	m_currentBombsMax = 0;
+	m_currentBombsLeft = 0;
+	m_currentSpeed = 0.0f;
+	m_currentFlameLength = 0;
+}
+
+void ABombermanPawn::Resurrect()
+{
+	bIsDead = false;
+
+	m_currentBombsMax = BaseBombAmount;
+	m_currentBombsLeft = m_currentBombsMax;
+	m_currentSpeed = BaseSpeed;
+	m_currentFlameLength = BaseFlameLength;
+
 }

@@ -29,7 +29,7 @@ class BOMBERMANLIKE_API ABombermanPawn : public APawn
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bombs)
-	int BombAmount;		//<! Component for managing damage
+	int BaseBombAmount;		//<! Component for managing damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bombs)
 	UClass* BombClass;		//<! Class for the bomb
 
@@ -37,45 +37,71 @@ public:
 	UDamageableComponent* DamageableComponent;		//<! Component for managing damage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement)
-	float Speed;		//<! Measures the amount of space for time unit that the pawn can move
+	float BaseSpeed;		//<! Measures the amount of space for time unit that the pawn can move
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bombs)
-	float FlameLength;		//<! Measures the length of the flames for the bombs placed by this pawn
+	int BaseFlameLength;		//<! Measures the length of the flames for the bombs placed by this pawn
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Death)
+	bool bIsDead;			//<! Indicates if the player has died
 	
 	/*! \brief Moves the pawn
 	 *
 	 * Using the input delta this function moves the indicated amount the pawn
 	 */
-	UFUNCTION(BlueprintCallable, Category = Movemet)
+	UFUNCTION(BlueprintCallable, Category = Movement)
 	void Move(FVector movementAmount);
 
 	/*! \brief Places a bomb
 	*
 	* If there are more bombs left to be able to be placed, the pawn will place one
 	*/
-	UFUNCTION(BlueprintCallable, Category = Movemet)
+	UFUNCTION(BlueprintCallable, Category = Bombs)
 	void PlaceBomb();
 
 	/*! \brief Increments the max number of bombs the pawn can place
 	*
 	* Increment the max number of bombs the pawn can place and also the current bombs left
 	*/
-	UFUNCTION(BlueprintCallable, Category = Movemet)
+	UFUNCTION(BlueprintCallable, Category = Bombs)
 	void IncreaseMaxNumberOFBombs(int amount);
 
 	/*! \brief Recovers a bomb that was placed so it can be placed again
 	*
 	* Once a bomb has explode we can place another one again
 	*/
-	UFUNCTION(BlueprintCallable, Category = Movemet)
+	UFUNCTION(BlueprintCallable, Category = Bombs)
 	void RecoverBomb(UExplodableComponent* explodable);
 
 	/*! \brief Resets the max number of bombs to the base amount
 	*
 	* Resets the max number of bombs to the base amount
 	*/
-	UFUNCTION(BlueprintCallable, Category = Movemet)
+	UFUNCTION(BlueprintCallable, Category = Bombs)
 	void ResetMaxBombs();
+
+	UFUNCTION(BlueprintCallable, Category = Movement)
+	float GetCurrentSpeed();
+
+	UFUNCTION(BlueprintCallable, Category = Movement)
+	void IncreaseCurrentSpeed(float amount);
+
+	UFUNCTION(BlueprintCallable, Category = Bombs)
+	void IncreaseFlameLength(int amount);
+
+	/*! \brief Kills the Pawn
+	*
+	* Kills the Pawn, eliminating it from the match
+	*/
+	UFUNCTION(BlueprintCallable, Category = Death)
+	void Kill();
+
+	/*! \brief Resurrects the Pawn
+	*
+	* Resurrects the Pawn, resetting all its variables to default
+	*/
+	UFUNCTION(BlueprintCallable, Category = Death)
+	void Resurrect();
 	
 	ABombermanPawn();	//<! Constructor
 
@@ -91,4 +117,9 @@ private:
 
 	int m_currentBombsMax;							//<! Maximum number of bombs this pawn can place
 	int m_currentBombsLeft;							//<! Current number of bombs this pawn can place
+
+	float m_currentSpeed;							//<! Current speed, including pickups modiffications
+
+	int m_currentFlameLength;						//<! Current flame length, including pickups modifications
+
 };
