@@ -102,6 +102,13 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = Death)
 	void Resurrect();
+
+	/*! \brief Sets the colour of the pawn
+	 *
+	 * Looks for the material of the mesh component and creates a dynamic instance assigning the colour to it
+	 */
+	UFUNCTION(BlueprintCallable, Category = Colour)
+	void AssignColour(FColor newColour);
 	
 	ABombermanPawn();	//<! Constructor
 

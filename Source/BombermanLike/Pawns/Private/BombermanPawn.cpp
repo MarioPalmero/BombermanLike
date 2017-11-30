@@ -2,6 +2,8 @@
 
 #include "Pawns/Public/BombermanPawn.h"
 #include "ConstructorHelpers.h"
+#include "Runtime/Engine/Classes/Components/MeshComponent.h"
+#include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
 #include "Engine/CollisionProfile.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -165,4 +167,23 @@ void ABombermanPawn::Resurrect()
 	m_currentFlameLength = BaseFlameLength;
 
 	DamageableComponent->Heal(DamageableComponent->MaxHealth);
+}
+
+void ABombermanPawn::AssignColour(FColor newColour)
+{
+	UMeshComponent* meshComponent = Cast<UMeshComponent>(GetComponentByClass(UMeshComponent::StaticClass()));
+
+	UMaterialInterface* previous = nullptr;
+	for (int matIndex = 0; matIndex < meshComponent->GetNumMaterials(); ++matIndex)
+	{
+		previous = meshComponent->GetMaterial(matIndex);
+		if (previous != nullptr)
+		{
+			UMaterialInstanceDynamic* dynamicInstance = UMaterialInstanceDynamic::Create(previous, GetWorld());
+			meshComponent->SetMaterial(matIndex, dynamicInstance);
+			dynamicInstance->SetVectorParameterValue("DiffuseColour", newColour);
+		}
+
+		previous = nullptr;
+	}
 }

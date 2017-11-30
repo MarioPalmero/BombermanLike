@@ -128,7 +128,9 @@ void GameModeFSM::BeginMatch(EGameModeStates previousState)
 				pawn->Resurrect();
 
 				ABombermanLikeGameModeBase::SwapPlayerController(m_UIControllers[controllerIndex]->GetPawn(), m_matchControllers[controllerIndex]);
+				// Set position and colour
 				pawn->SetActorLocation(startPoints[controllerIndex]->GetActorLocation());
+				pawn->AssignColour(m_matchControllers[controllerIndex]->GetLocalPlayer()->GetControllerId() == 0 ? FColor::Blue : FColor::Green);
 			}
 
 			AMapManager::GetInstance()->PlaceDestructibleBlocks();
