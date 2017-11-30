@@ -5,7 +5,11 @@
 #include "ConstructorHelpers.h"
 #include "Pawns/Public/BombermanPawn.h"
 
-ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super()
+ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super(),
+	NumPlayers(1),
+	m_lastMatchResult(EMatchResult::ResultDraw),
+	m_scorePlayer1(0),
+	m_scorePlayer2(0)
 {
 	// Initial Classes Set up
 	PlayerControllerClass = AUIPlayerController::StaticClass(); 
@@ -17,6 +21,7 @@ ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super()
 	// Following RAII we initialize and destroy resources properly
 	m_gameState = new GameModeFSM();
 
+	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(true);
 }
 
@@ -41,6 +46,43 @@ void ABombermanLikeGameModeBase::NotifyEndCharacterSelection()
 	m_gameState->SetState(EGameModeStates::Match);
 }
 
+void ABombermanLikeGameModeBase::NotifyEndEndMatch()
+{
+	m_gameState->SetState(EGameModeStates::Match);
+}
+
+void ABombermanLikeGameModeBase::NotifyPlayerStatusAfterMatch(bool bIsPlayer1Alive, bool bIsPlayer2Alive)
+{
+	if (bIsPlayer1Alive == bIsPlayer2Alive)
+	{
+		m_lastMatchResult = EMatchResult::ResultDraw;
+	}
+	else if (bIsPlayer1Alive)
+	{
+		m_lastMatchResult = EMatchResult::ResultPlayer1;
+		++m_scorePlayer1;
+	}
+	else
+	{
+		m_lastMatchResult = EMatchResult::ResultPlayer2;
+		++m_scorePlayer2;
+	}
+}
+
+EMatchResult ABombermanLikeGameModeBase::GetLastMatchResult() const
+{
+	return m_lastMatchResult;
+}
+
+int ABombermanLikeGameModeBase::GetScore(int player) const
+{
+	if (player == 0)
+		return m_scorePlayer1;
+	else if(player == 1)
+		return m_scorePlayer2;
+	return 0;
+}
+
 void ABombermanLikeGameModeBase::SwapPlayerController(APawn * pawn, APlayerController * newPlayerController)
 {
 	if (pawn != nullptr && pawn->GetController() != nullptr)
@@ -52,8 +94,9 @@ void ABombermanLikeGameModeBase::SwapPlayerController(APawn * pawn, APlayerContr
 			UPlayer* player = oldPlayerController->Player;
 			if (player != nullptr)
 			{
-				newPlayerController->SetPlayer(player);
+				ClearInputFromController(oldPlayerController);
 				oldPlayerController->SetActorTickEnabled(false);
+				newPlayerController->SetPlayer(player);
 
 				AActor* oldViewTarget = oldPlayerController->GetViewTarget();
 
@@ -73,6 +116,14 @@ void ABombermanLikeGameModeBase::SwapPlayerController(APawn * pawn, APlayerContr
 			}
 		}
 	}
+}
+
+void ABombermanLikeGameModeBase::ClearInputFromController(APlayerController* controller)
+{
+	controller->PlayerInput->FlushPressedKeys();
+	controller->InputComponent->ClearBindingValues();
+	controller->DisableInput(controller);
+	controller->EnableInput(controller);
 }
 
 

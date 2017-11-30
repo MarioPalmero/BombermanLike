@@ -10,7 +10,7 @@
  * This type represents the things that can be places in a cell of the map
  */
 UENUM(BlueprintType)
-enum EMapCellType
+enum class EMapCellType : uint8
 {
 	Empty,
 	IndestructibleBlock,

@@ -72,8 +72,6 @@ protected:
 
 private:
 	UFUNCTION()
-	void AnyKeyReleased();		//<! Method that handles any key being pressed
-	UFUNCTION()
 	void Continue();			//<! Method to accept or continue
 	UFUNCTION()
 	void CreatePlayer2();		//<! Creates the second player

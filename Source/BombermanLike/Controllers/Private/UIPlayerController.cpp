@@ -26,10 +26,6 @@ AUIPlayerController::AUIPlayerController() : Super(),
 
 }
 
-void AUIPlayerController::EndEndMatchScreen()
-{
-}
-
 void AUIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,9 +37,6 @@ void AUIPlayerController::SetupInputComponent()
 
 	// Check if PlayerInputComponent is valid (not NULL)
 	check(PlayerInput);
-
-	// Binding the any key action
-	InputComponent->BindAction("AnyKey", IE_Released, this, &AUIPlayerController::AnyKeyReleased);
 
 	// Bind buttons to actions
 	InputComponent->BindAction(*FString("Continue1"), IE_Released, this, &AUIPlayerController::Continue);
@@ -73,6 +66,7 @@ void AUIPlayerController::EndSplashScreen()
 				m_splashWidget->OnEndSplashScreenFinished.RemoveDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndSplash);
 		}
 		m_splashWidget->RemoveFromViewport();
+		m_splashWidget = nullptr;
 	}
 }
 
@@ -100,26 +94,34 @@ void AUIPlayerController::EndCharacterSelectionScreen()
 				m_characterSelectionWidget->OnEndCharacterSelectionFinished.RemoveDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndCharacterSelection);
 		}
 		m_characterSelectionWidget->RemoveFromViewport();
+		m_characterSelectionWidget = nullptr;
 	}
 }
 
 void AUIPlayerController::StartEndMatchScreen()
 {
+	if (m_endMatchWidgetClass != nullptr && m_endMatchWidget == nullptr)
+		m_endMatchWidget  = CreateWidget<UMenuUserWidget>(GetWorld(), m_endMatchWidgetClass);
 
+	if (m_endMatchWidget != nullptr)
+	{
+		m_endMatchWidget->AddToViewport();
+		m_endMatchWidget->StartEndMatch();
+	}
 }
 
-void AUIPlayerController::AnyKeyReleased()
+void AUIPlayerController::EndEndMatchScreen()
 {
-	ABombermanLikeGameModeBase* gm = Cast<ABombermanLikeGameModeBase>(GetWorld()->GetAuthGameMode());
-	if (gm != nullptr)
+	if (m_endMatchWidget != nullptr)
 	{
-		EGameModeStates state = gm->GetCurrentState();
-		if (state == EGameModeStates::Splash)
+		if (m_endMatchWidget->OnEndEndMatchFinished.IsBound())
 		{
-			if(!m_splashWidget->OnEndSplashScreenFinished.IsBound())
-				m_splashWidget->OnEndSplashScreenFinished.AddDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndSplash);
-			m_splashWidget->EndSplashScreen();
+			ABombermanLikeGameModeBase* gm = Cast<ABombermanLikeGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (gm != nullptr)
+				m_endMatchWidget->OnEndEndMatchFinished.RemoveDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndEndMatch);
 		}
+		m_endMatchWidget->RemoveFromViewport();
+		m_endMatchWidget = nullptr;
 	}
 }
 
@@ -129,17 +131,35 @@ void AUIPlayerController::Continue()
 	if (gm != nullptr)
 	{
 		EGameModeStates state = gm->GetCurrentState();
-		if (state == EGameModeStates::CharacterSelection)
+		if (state == EGameModeStates::CharacterSelection && m_characterSelectionWidget != nullptr)
 		{
 			if (!m_characterSelectionWidget->OnEndCharacterSelectionFinished.IsBound())
 				m_characterSelectionWidget->OnEndCharacterSelectionFinished.AddDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndCharacterSelection);
 			m_characterSelectionWidget->EndCharacterSelection();
+		}
+		else if (state == EGameModeStates::Splash && m_splashWidget != nullptr)
+		{
+			if (!m_splashWidget->OnEndSplashScreenFinished.IsBound())
+				m_splashWidget->OnEndSplashScreenFinished.AddDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndSplash);
+			m_splashWidget->EndSplashScreen();
+		}
+		else if (state == EGameModeStates::EndMatch && m_endMatchWidget != nullptr)
+		{
+			if (!m_endMatchWidget->OnEndEndMatchFinished.IsBound())
+				m_endMatchWidget->OnEndEndMatchFinished.AddDynamic(gm, &ABombermanLikeGameModeBase::NotifyEndEndMatch);
+			m_endMatchWidget->EndEndMatch();
 		}
 	}
 }
 
 void AUIPlayerController::CreatePlayer2()
 {
-	UGameplayStatics::CreatePlayer(GetWorld(), 1);
+	ABombermanLikeGameModeBase* gm = Cast<ABombermanLikeGameModeBase>(GetWorld()->GetAuthGameMode());
 
+	if (gm != nullptr)
+	{
+		if(gm->NumPlayers == 1)
+			UGameplayStatics::CreatePlayer(GetWorld(), 1);
+		gm->NumPlayers = 2;
+	}
 }

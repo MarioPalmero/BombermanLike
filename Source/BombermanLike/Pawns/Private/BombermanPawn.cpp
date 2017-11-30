@@ -52,6 +52,8 @@ void ABombermanPawn::Tick(float DeltaTime)
 
 void ABombermanPawn::PossessedBy(AController* NewController)
 {
+	Super::PossessedBy(NewController);
+
 	if (Cast<APlayerController>(NewController)->GetLocalPlayer()->GetControllerId() > 0)
 		m_collisionComponent->SetCollisionProfileName("Player2");
 }
@@ -162,4 +164,5 @@ void ABombermanPawn::Resurrect()
 	m_currentSpeed = BaseSpeed;
 	m_currentFlameLength = BaseFlameLength;
 
+	DamageableComponent->Heal(DamageableComponent->MaxHealth);
 }

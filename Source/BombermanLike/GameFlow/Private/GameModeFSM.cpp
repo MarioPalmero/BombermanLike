@@ -1,8 +1,10 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "GameFlow/Public/GameModeFSM.h"
+#include "Engine.h"
 #include "EngineUtils.h"
 #include "BombermanLikeGameModeBase.h"
+#include "Pawns/Public/BombermanPawn.h"
 #include "Map/Public/MapManager.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -69,15 +71,8 @@ void GameModeFSM::UpdateSplash(float DeltaTime)
 
 void GameModeFSM::EndSplash(EGameModeStates nextState)
 {
-	if (m_UIControllers.Num() <= 0)
-	{
-		if (m_gameMode != nullptr)
-		{
-			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
-			if (controller != nullptr)
-				m_UIControllers.Add(controller);
-		}
-	}
+	for (AUIPlayerController* controller : m_UIControllers)
+		ABombermanLikeGameModeBase::ClearInputFromController(controller);
 
 	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
 		m_UIControllers[0]->EndSplashScreen();
@@ -85,16 +80,6 @@ void GameModeFSM::EndSplash(EGameModeStates nextState)
 
 void GameModeFSM::BeginCharacterSelection(EGameModeStates previousState)
 {
-	if (m_UIControllers.Num() <= 0)
-	{
-		if (m_gameMode != nullptr)
-		{
-			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
-			if (controller != nullptr)
-				m_UIControllers.Add(controller);
-		}
-	}
-
 	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
 		m_UIControllers[0]->StartCharacterSelectionScreen();
 }
@@ -106,22 +91,15 @@ void GameModeFSM::UpdateCharacterSelection(float DeltaTime)
 
 void GameModeFSM::EndCharacterSelection(EGameModeStates nextState)
 {
-	if (m_UIControllers.Num() <= 0)
-	{
-		if (m_gameMode != nullptr)
-		{
-			AUIPlayerController* controller = Cast<AUIPlayerController>(m_gameMode->GetWorld()->GetFirstPlayerController());
-			if (controller != nullptr)
-				m_UIControllers.Add(controller);
-		}
-	}
-
 	// Check if the number of players don't match with the number of registered controllers
-	while (m_UIControllers.Num() < m_gameMode->GetNumPlayers())
+	while (m_UIControllers.Num() < m_gameMode->NumPlayers)
 	{
 		AUIPlayerController* controller = Cast<AUIPlayerController>(UGameplayStatics::GetPlayerController(m_gameMode->GetWorld(), m_UIControllers.Num()));
 		m_UIControllers.Add(controller);
 	}
+
+	for (AUIPlayerController* controller : m_UIControllers)
+		ABombermanLikeGameModeBase::ClearInputFromController(controller);
 
 	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
 		m_UIControllers[0]->EndCharacterSelectionScreen();
@@ -139,10 +117,18 @@ void GameModeFSM::BeginMatch(EGameModeStates previousState)
 				m_matchControllers.Add(m_gameMode->GetWorld()->SpawnActor<AMatchPlayerController>(AMatchPlayerController::StaticClass()));
 			}
 
-			// Swaping UI controllers by Match controllers
-			for (int controllerIndex = 0; controllerIndex < m_matchControllers.Num() && controllerIndex < m_UIControllers.Num(); ++controllerIndex)
+			TArray<APlayerStart*> startPoints;
+			for (TActorIterator<APlayerStart> startPointItr(m_gameMode->GetWorld()); startPointItr; ++startPointItr)
+				startPoints.Add(*startPointItr);
+
+			// Resetting pawns and Swaping UI controllers by Match controllers
+			for (int controllerIndex = 0; controllerIndex < m_matchControllers.Num() && controllerIndex < m_UIControllers.Num() && controllerIndex < startPoints.Num(); ++controllerIndex)
 			{
+				ABombermanPawn* pawn = Cast<ABombermanPawn>(m_UIControllers[controllerIndex]->GetPawn());
+				pawn->Resurrect();
+
 				ABombermanLikeGameModeBase::SwapPlayerController(m_UIControllers[controllerIndex]->GetPawn(), m_matchControllers[controllerIndex]);
+				pawn->SetActorLocation(startPoints[controllerIndex]->GetActorLocation());
 			}
 
 			AMapManager::GetInstance()->PlaceDestructibleBlocks();
@@ -152,7 +138,27 @@ void GameModeFSM::BeginMatch(EGameModeStates previousState)
 
 void GameModeFSM::UpdateMatch(float DeltaTime)
 {
+	for (AMatchPlayerController* controller : m_matchControllers)
+	{
+		ABombermanPawn* pawn = Cast<ABombermanPawn>(controller->GetPawn());
+		if (pawn != nullptr && pawn->bIsDead)
+		{
+			bool bIsPlayer1Alive = false, bIsPlayer2Alive = false;
 
+			// The match has ended so we notify the score to the game mode
+			for (AMatchPlayerController* controller : m_matchControllers)
+			{
+				ABombermanPawn* pawn = Cast<ABombermanPawn>(controller->GetPawn());
+				if (controller->GetLocalPlayer()->GetControllerId() == 0 && pawn != nullptr)
+					bIsPlayer1Alive = !pawn->bIsDead;
+				else if (controller->GetLocalPlayer()->GetControllerId() == 1 && pawn != nullptr)
+					bIsPlayer2Alive = !pawn->bIsDead;
+			}
+
+			m_gameMode->NotifyPlayerStatusAfterMatch(bIsPlayer1Alive, bIsPlayer2Alive);
+			SetState(EGameModeStates::EndMatch);
+		}
+	}
 }
 
 void GameModeFSM::EndMatch(EGameModeStates nextState)
@@ -162,7 +168,14 @@ void GameModeFSM::EndMatch(EGameModeStates nextState)
 
 void GameModeFSM::BeginEndMatch(EGameModeStates previousState)
 {
+	// Swaping UI controllers by Match controllers
+	for (int controllerIndex = 0; controllerIndex < m_matchControllers.Num() && controllerIndex < m_UIControllers.Num(); ++controllerIndex)
+	{
+		ABombermanLikeGameModeBase::SwapPlayerController(m_matchControllers[controllerIndex]->GetPawn(), m_UIControllers[controllerIndex]);
+	}
 
+	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
+		m_UIControllers[0]->StartEndMatchScreen();
 }
 
 void GameModeFSM::UpdateEndMatch(float DeltaTime)
@@ -172,5 +185,9 @@ void GameModeFSM::UpdateEndMatch(float DeltaTime)
 
 void GameModeFSM::EndEndMatch(EGameModeStates nextState)
 {
+	for (AUIPlayerController* controller : m_UIControllers)
+		ABombermanLikeGameModeBase::ClearInputFromController(controller);
 
+	if (m_UIControllers.Num() >= 1 && m_UIControllers[0] != nullptr)
+		m_UIControllers[0]->EndEndMatchScreen();
 }
