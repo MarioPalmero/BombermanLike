@@ -69,12 +69,16 @@ void AMapManager::InitializeGrid()
 
 void AMapManager::PlaceIndestructibleBlocks()
 {
-	for (int indexRows = 0; indexRows < Rows; ++indexRows)
+	for (int indexRows = -1; indexRows <= Rows; ++indexRows)
 	{
-		for (int indexColumns = 0; indexColumns < Columns; ++indexColumns)
+		for (int indexColumns = -1; indexColumns <= Columns; ++indexColumns)
 		{
-			
-			if (indexColumns % 2 == 1 && indexRows % 2 == 1)
+			if (indexColumns < 0 || indexRows < 0 || indexColumns >= Columns || indexRows >= Rows)
+			{
+				AActor* block = GetWorld()->SpawnActor<AActor>(IndestructibleBlock);
+				block->SetActorLocation(GetTilePosition(indexColumns, indexRows));
+			}
+			else if (indexColumns % 2 == 1 && indexRows % 2 == 1)
 			{
 				// First we create the blocks in the abstract layer
 				m_map[indexRows][indexColumns] = EMapCellType::IndestructibleBlock;
