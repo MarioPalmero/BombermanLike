@@ -1,15 +1,47 @@
 // - Mario Palmero [2017], zlib/libpng licensed.
 
 #include "Controllers/Public/MatchPlayerController.h"
+#include "ConstructorHelpers.h"
 #include "Pawns/Public/BombermanPawn.h"
+#include "UI/Widgets/Public/MenuUserWidget.h"
 
 AMatchPlayerController::AMatchPlayerController() : Super(),
-	m_movementInput(FVector::ZeroVector)
+	m_movementInput(FVector::ZeroVector),
+	m_bWalkUpPressed(false),
+	m_bWalkDownPressed(false),
+	m_bWalkLeftPressed(false),
+	m_bWalkRightPressed(false),
+	m_PlaceBombPressed(false)
 {
-	// Set the controller to tick every frame
-	PrimaryActorTick.bCanEverTick = true;
+	static ConstructorHelpers::FClassFinder<UUserWidget> matchWidgetLoader(TEXT("WidgetBlueprint'/Game/UI/Widgets/BP_MatchTimer.BP_MatchTimer_C'"));
+	if (matchWidgetLoader.Class != nullptr)
+		m_matchWidgetClass = matchWidgetLoader.Class;
 
-	
+	// Set the controller to tick every frame
+	PrimaryActorTick.bCanEverTick = true;	
+}
+
+
+void AMatchPlayerController::ShowCountdown(int second)
+{
+
+	if (m_matchWidgetClass != nullptr && m_matchWidget == nullptr)
+		m_matchWidget = CreateWidget<UMenuUserWidget>(GetWorld(), m_matchWidgetClass);
+
+	if (m_matchWidget != nullptr)
+	{
+		m_matchWidget->AddToViewport();
+		m_matchWidget->StartCountdown(second);
+	}
+}
+
+void AMatchPlayerController::RemoveCountdown()
+{
+	if (m_matchWidget != nullptr)
+	{
+		m_matchWidget->RemoveFromViewport();
+		m_matchWidget = nullptr;
+	}
 }
 
 void AMatchPlayerController::Tick(float DeltaTime)
@@ -48,6 +80,7 @@ void AMatchPlayerController::SetupInputComponent()
 	InputComponent->BindAction(*("WalkLeft" + sufix), IE_Released, this, &AMatchPlayerController::WalkLeftReleased);
 	InputComponent->BindAction(*("WalkRight" + sufix), IE_Pressed, this, &AMatchPlayerController::WalkRightPressed);
 	InputComponent->BindAction(*("WalkRight" + sufix), IE_Released, this, &AMatchPlayerController::WalkRightReleased);
+	InputComponent->BindAction(*("PlaceBomb" + sufix), IE_Pressed, this, &AMatchPlayerController::PlaceBombPressed);
 	InputComponent->BindAction(*("PlaceBomb" + sufix), IE_Released, this, &AMatchPlayerController::PlaceBombReleased);
 }
 
@@ -91,11 +124,20 @@ void AMatchPlayerController::WalkRightReleased()
 	m_bWalkRightPressed = false;
 }
 
+void AMatchPlayerController::PlaceBombPressed()
+{
+	m_PlaceBombPressed = true;
+}
+
 void AMatchPlayerController::PlaceBombReleased()
 {
-	ABombermanPawn* pawn = Cast<ABombermanPawn>(GetPawn());
-	if (pawn != nullptr)
+	if (m_PlaceBombPressed)
 	{
-		pawn->PlaceBomb();
+		ABombermanPawn* pawn = Cast<ABombermanPawn>(GetPawn());
+		if (pawn != nullptr)
+		{
+			pawn->PlaceBomb();
+		}
 	}
+	m_PlaceBombPressed = false;
 }

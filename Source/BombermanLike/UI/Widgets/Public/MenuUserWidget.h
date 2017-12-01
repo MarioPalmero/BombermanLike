@@ -66,20 +66,27 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = MenuState)
 	void EndEndMatch();
 
-	/*! \brief Function to get the UI Controller
+	/*! \brief Starts a countdown from the second passed as parameter
 	*
-	* Function that returns the UI Controller associated to this widget
+	* Will show a countdown from the second passed as parameter to 0
 	*/
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Controller)
+	void StartCountdown(int second);
+
+	/*! \brief Function to get the UI Controller
+	 *
+	 * Function that returns the UI Controller associated to this widget
+	 */
 	UFUNCTION(BlueprintCallable, Category = Controller)
 	AUIPlayerController* GetUIPlayerController();
 
 	/*! \brief Function to set the UI Controller
-	*
-	* Function that sets the UI Controller associated to this widget
-	*/
+	 *
+	 * Function that sets the UI Controller associated to this widget
+	 */
 	UFUNCTION(BlueprintCallable, Category = Controller)
 	void SetUIPlayerController(AUIPlayerController* controller);
-
+	
 	/////////////////////////////////////////////////
 	/// DELEGATES
 	/////////////////////////////////////////////////

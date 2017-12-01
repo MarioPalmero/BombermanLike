@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GameState)
 	int NumPlayers;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GameState)
+	int MatchDuration;
+
 	/*! \brief Returns current state
 	 *
 	 * Returns current state of the game

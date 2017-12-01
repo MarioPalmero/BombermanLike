@@ -7,7 +7,7 @@
 
 ABombermanLikeGameModeBase::ABombermanLikeGameModeBase() : Super(),
 	NumPlayers(1),
-	MatchDuration(70),
+	MatchDuration(40),
 	m_lastMatchResult(EMatchResult::ResultDraw),
 	m_scorePlayer1(0),
 	m_scorePlayer2(0)

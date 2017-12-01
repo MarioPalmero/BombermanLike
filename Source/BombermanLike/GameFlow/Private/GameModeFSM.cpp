@@ -10,7 +10,8 @@
 
 
 GameModeFSM::GameModeFSM() : FSM(EGameModeStates::Splash),
-	m_gameMode(nullptr)
+	m_gameMode(nullptr),
+	m_matchTimer(0.0f)
 {
 	InitializeFunctions();
 }
@@ -111,6 +112,8 @@ void GameModeFSM::BeginMatch(EGameModeStates previousState)
 	{
 		if (m_gameMode != nullptr)
 		{
+			m_matchTimer = m_gameMode->MatchDuration;
+
 			// Should only be executed the first match
 			while (m_matchControllers.Num() < m_UIControllers.Num())
 			{
@@ -140,26 +143,39 @@ void GameModeFSM::BeginMatch(EGameModeStates previousState)
 
 void GameModeFSM::UpdateMatch(float DeltaTime)
 {
+	// We do this check to call just once the ShowCountdown function
+	bool bShouldShowCountdown = m_matchTimer > 10.0f && m_matchTimer - DeltaTime <= 10.0f;
+	m_matchTimer -= DeltaTime;
+
+	bool bSomebodyDead = false;
+	// We look for dead players and also check if the countdown should be shown
 	for (AMatchPlayerController* controller : m_matchControllers)
 	{
 		ABombermanPawn* pawn = Cast<ABombermanPawn>(controller->GetPawn());
-		if (pawn != nullptr && pawn->bIsDead)
+		if(pawn != nullptr)
+			bSomebodyDead = bSomebodyDead || pawn->bIsDead;
+
+		if (bShouldShowCountdown && controller->GetLocalPlayer()->GetControllerId() == 0)
+			controller->ShowCountdown(FMath::FloorToInt(m_matchTimer) + 1);
+	}
+
+	// If somebody is dead or the timer has expired the match has to end
+	if(bSomebodyDead || m_matchTimer < 0.0f)
+	{
+		bool bIsPlayer1Alive = false, bIsPlayer2Alive = false;
+
+		// The match has ended so we notify the score to the game mode
+		for (AMatchPlayerController* controller : m_matchControllers)
 		{
-			bool bIsPlayer1Alive = false, bIsPlayer2Alive = false;
-
-			// The match has ended so we notify the score to the game mode
-			for (AMatchPlayerController* controller : m_matchControllers)
-			{
-				ABombermanPawn* pawn = Cast<ABombermanPawn>(controller->GetPawn());
-				if (controller->GetLocalPlayer()->GetControllerId() == 0 && pawn != nullptr)
-					bIsPlayer1Alive = !pawn->bIsDead;
-				else if (controller->GetLocalPlayer()->GetControllerId() == 1 && pawn != nullptr)
-					bIsPlayer2Alive = !pawn->bIsDead;
-			}
-
-			m_gameMode->NotifyPlayerStatusAfterMatch(bIsPlayer1Alive, bIsPlayer2Alive);
-			SetState(EGameModeStates::EndMatch);
+			ABombermanPawn* pawn = Cast<ABombermanPawn>(controller->GetPawn());
+			if (controller->GetLocalPlayer()->GetControllerId() == 0 && pawn != nullptr)
+				bIsPlayer1Alive = !pawn->bIsDead;
+			else if (controller->GetLocalPlayer()->GetControllerId() == 1 && pawn != nullptr)
+				bIsPlayer2Alive = !pawn->bIsDead;
 		}
+
+		m_gameMode->NotifyPlayerStatusAfterMatch(bIsPlayer1Alive, bIsPlayer2Alive);
+		SetState(EGameModeStates::EndMatch);
 	}
 }
 

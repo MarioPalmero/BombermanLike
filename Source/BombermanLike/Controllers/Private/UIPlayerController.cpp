@@ -40,7 +40,7 @@ void AUIPlayerController::SetupInputComponent()
 
 	// Bind buttons to actions
 	InputComponent->BindAction(*FString("Continue1"), IE_Released, this, &AUIPlayerController::Continue);
-	InputComponent->BindAction(*FString("Continue2"), IE_Released, this, &AUIPlayerController::CreatePlayer2);
+	//InputComponent->BindAction(*FString("Continue2"), IE_Released, this, &AUIPlayerController::CreatePlayer2);
 }
 
 void AUIPlayerController::StartSplashScreen()
@@ -72,6 +72,7 @@ void AUIPlayerController::EndSplashScreen()
 
 void AUIPlayerController::StartCharacterSelectionScreen()
 {
+	CreatePlayer2();
 
 	if (m_characterSelectionWidgetClass != nullptr && m_characterSelectionWidget == nullptr)
 		m_characterSelectionWidget = CreateWidget<UMenuUserWidget>(GetWorld(), m_characterSelectionWidgetClass);

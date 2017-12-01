@@ -64,4 +64,6 @@ private:
 	ABombermanLikeGameModeBase* m_gameMode;					//!< Holds a reference to the current game mode
 	TArray<AUIPlayerController*> m_UIControllers;			//!< Holds a reference to UI controllers when these exist
 	TArray<AMatchPlayerController*> m_matchControllers;		//!< Holds a reference to the Match controllers when these exist
+
+	float m_matchTimer;										//!< The time left for the match to end
 };
