@@ -3,6 +3,7 @@
 This game has been created under Unreal Engine 4.18.1, but does not use any fancy feature so it should be portable to older versions.
 
 No other library or tool beside the named engine has been used.
+It took me around 17 hours get to this point.
 
 Future Roadmap:
 
